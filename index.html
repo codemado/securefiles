@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أداة تشفير وتوجيه الروابط الخاصة بي</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        input, text-area {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 5px;
+            border: 1px solid #333;
+            background-color: #2a2a2a;
+            color: #fff;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+        button:hover { background-color: #2563eb; }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #2d2d2d;
+            border-radius: 5px;
+            display: none;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app-container">
+    <h2>أداة تشفير الروابط (Base64)</h2>
+    <p>ضع الرابط الأصلي بالأسفل لتوليد الرابط المشفر:</p>
+    <input type="url" id="urlInput" placeholder="https://example.com" dir="ltr">
+    <button onclick="generateMaskedURL()">تشفير الرابط</button>
+
+    <div class="result-box" id="resultBox">
+        <p>الرابط المشفر الخاص بك:</p>
+        <strong id="finalURL" style="color: #60a5fa; user-select: all;"></strong>
+    </div>
+</div>
+
+<script>
+    // --- الجزء الأول: فك التشفير والتوجيه التلقائي ---
+    // فحص إذا كان الرابط الحالي يحتوي على كود مشفر بعد علامة الاستفهام ؟
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedData = urlParams.get('go');
+
+    if (encodedData) {
+        try {
+            // إخفاء واجهة الموقع أثناء التوجيه
+            document.getElementById('app-container').style.display = 'none';
+            // فك التشفير
+            const originalURL = atob(encodedData);
+            // التوجيه الفوري للرابط الأصلي
+            window.location.href = originalURL;
+        } catch (e) {
+            // إذا حدث خطأ في الكود المشفر
+            alert("الرمز المشفر غير صالح!");
+            document.getElementById('app-container').style.display = 'block';
+        }
+    }
+
+    // --- الجزء الثاني: صناعة الرابط المشفر ---
+    function generateMaskedURL() {
+        const input = document.getElementById('urlInput').value.trim();
+        if (!input) {
+            alert("من فضلك أدخل رابطاً أولاً");
+            return;
+        }
+
+        // تشفير الرابط المدخل إلى Base64
+        const encoded = btoa(input);
+        
+        // صناعة الرابط الجديد (باستخدام رابط الملف الحالي + الكود المشفر)
+        const currentSiteURL = window.location.href.split('?')[0];
+        const maskedResult = currentSiteURL + "?go=" + encoded;
+
+        // عرض النتيجة للمستخدم
+        document.getElementById('finalURL').innerText = maskedResult;
+        document.getElementById('resultBox').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
